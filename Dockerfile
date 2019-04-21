@@ -1,10 +1,10 @@
-# Copyright (c) 2019 Steven R. Brandt, and Roland Haas
+# Copyright (c) 2019 Steven R. Brandt, Roland Haas, Junjie Zhao
 #
 # Distributed under the LGPL
 
 # To run this notebook:
 #
-#   docker run -p 8888:8888 -it --rm ndslabs/jupyter-et
+#   docker run -p 8888:8888 -it --rm benjzhao/jupyter-etnew
 #
 # Once it starts, a URL, suitable for cutting and pasting, will appear on
 # your terminal. Use that URL to connect to the notebook.
@@ -75,6 +75,13 @@ ENV PKG_CONFIG_PATH /usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/us
 
 USER root
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+
 USER $NB_USER
+RUN curl -kLO https://raw.githubusercontent.com/gridaphobe/CRL/ET_2019_03/GetComponents && \
+    chmod a+x GetComponents && \
+    ./GetComponents --parallel https://bitbucket.org/einsteintoolkit/manifest/raw/ET_2019_03/einsteintoolkit.th
+WORKDIR /Cactus
+RUN ./simfactory/bin/sim setup-silent && \
+    ./simfactory/bin/sim build --mdbkey make 'make -j1' --thornlist ../einsteintoolkit.th | cat
 
 CMD ["start-notebook.sh"]
